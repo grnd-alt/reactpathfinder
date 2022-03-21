@@ -29,6 +29,8 @@ class GridObject{
         } else if (state === "border"){
             this.color = "blue"
             // this.that.state.gridelements[this.y][this.x].style.background="blue";
+        } else if (state === "normal"){
+            this.color = "black"
         }
         this.state = state
     }
@@ -52,7 +54,7 @@ class Pathfind extends Component {
             gridelements:[],
             gridobjects: [],
             startpoint:false,
-            endpoint:false,
+            endpoint:[],
         }
     }
     updateInputValueWidth(event){
@@ -69,7 +71,7 @@ class Pathfind extends Component {
     }
 
     marginWidthCalc(){
-        let magicnumber = 0.65;
+        let magicnumber = 0.8;
         let viewportwidth = window.innerWidth;
         let viewportheight  = window.innerHeight;
         let marginfromwidth = parseInt((viewportwidth*(1-magicnumber))/(2*this.state.width))
@@ -91,7 +93,12 @@ class Pathfind extends Component {
     changeBoxState(ev){
         let x = parseInt(ev.target.getAttribute("x"));
         let y = parseInt(ev.target.parentNode.getAttribute("y"));
-
+        if(this.state.startpoint !== false && this.state.clickmode === "start"){
+            console.log(this.state.startpoint);
+            this.state.startpoint.setBoxState("normal")
+        } else {
+            console.log(this.state.startpoint);
+        }
         this.setState(
             {
                 gridobjects:this.state.gridobjects.map((line,yind) => {
@@ -106,12 +113,12 @@ class Pathfind extends Component {
                     } return line
                 }),
                 startpoint:this.state.clickmode === "start"?this.state.gridobjects[y][x]:this.state.startpoint,
-                endpoint:this.state.clickmode === "end"?this.state.gridobjects[y][x]:this.state.endpoint
+                endpoint:this.state.clickmode === "end"?[...this.state.endpoint, this.state.gridobjects[y][x]]:this.state.endpoint
             }
         )
     }
     generateGridObjects() {
-        this.state.endpoint = false
+        this.state.endpoint = []
         this.state.startpoint = false
         this.state.gridobjects = []
         for (let y = 0; y < this.state.height;y++){
@@ -134,17 +141,14 @@ class Pathfind extends Component {
                 let item = opentorun[i]
                 for (let m = 0; m < calcers.length; m++){
                     try{
-                        // alert(item.y + calcers[m][0])
                         let newitem = this.state.gridobjects[item.y + calcers[m][0]][item.x + calcers[m][1]]
                         if(newitem.before === null && newitem !== this.state.startpoint && newitem.state !== "border"){
+                            if(newitem.state === "end"){
+                                newitem.AddToPath(item)
+                                return newitem
+                            }
                             newitem.AddToPath(item)
                             endofpaths.push(newitem)
-                            if (endofpaths[endofpaths.length -1].x === this.state.endpoint.x && endofpaths[endofpaths.length-1].y === this.state.endpoint.y) {
-                                return endofpaths[endofpaths.length-1]
-                            }
-                            this.forceUpdate()
-                        } else {
-                            console.log(newitem.x+","+newitem.y);
                         }
                     } catch{
                         continue;
@@ -153,7 +157,8 @@ class Pathfind extends Component {
             }
             opentorun = endofpaths.map((item)=> {return item})
             console.log(opentorun);
-            await new Promise(resolve => setTimeout(resolve,300))
+            this.forceUpdate()
+            await new Promise(resolve => setTimeout(resolve,100))
         }
     }
     async pathFindStarter() {
