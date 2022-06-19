@@ -1,0 +1,16 @@
+.row{
+    display:flex;
+    justify-content: space-evenly;
+    margin:0px;
+    flex-grow: 1;
+}
+
+.grid{
+    margin: auto;
+    /* margin-block:10vh; */
+    max-width: 100vw;
+    max-height:100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}

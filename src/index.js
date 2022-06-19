@@ -4,12 +4,14 @@ import './index.css';
 import App from './App';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import PathFinder from './pages/PathFinder';
+import GoodPathFind from './components/goodPathfind'
 // import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
     <BrowserRouter>
       <Routes>
       <Route path="pathfinder" element={<PathFinder/>}></Route>
+      <Route path="goodfinder" element={<GoodPathFind/>}></Route>
       <Route path="/" element={<App/>}/>
       </Routes>
     </BrowserRouter>,
